@@ -35,7 +35,8 @@ body{
   max-height:900px;
   position:relative;
   margin:auto;
-  padding: env(safe-area-inset-top,20px) 10px 20px 10px;
+  /* [แก้ไข] นำ padding แนวตั้งออกเพื่อให้ body จัดกึ่งกลางได้สมบูรณ์ */
+  padding: 0 10px;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -55,7 +56,8 @@ body{
   transform-origin:center;
   /* initial (hidden) state for fade-in transitions */
   opacity:0;
-  transform: translateY(8px) scale(0.995);
+  /* transform จะถูกกำหนดโดย JS ใน restack() */
+  transform: translateY(8px) scale(0.995); 
   transition: transform 320ms cubic-bezier(.22,.9,.28,1), opacity 260ms linear;
   user-select:none;
   -webkit-user-select:none;
@@ -64,6 +66,7 @@ body{
 /* active card visible */
 .card.active{
   opacity:1;
+  /* transform จะถูกกำหนดโดย JS ใน restack() */
   transform: translateY(0) scale(1);
 }
 
@@ -137,41 +140,20 @@ body{
 /* prevent image selection dragging artifacts */
 .card-img, .logo-bubble img { -webkit-user-drag: none; user-drag: none; }
 
-/* --- Special CSS for Card 22 REMOVED --- */
 /* Card 18's style is carried over from last successful change */
 .card[data-id="18"] .card-img {
   object-position: top;
 }
 
 /* --- Special CSS for iPhone 13 Mini (375px wide) --- */
+/* Scale factor ถูกย้ายไปจัดการใน JS เพื่อให้ปัดได้ */
 @media (max-width: 375px) {
-  /*
-    ลดขนาดการ์ดลง 12% โดยการใช้ transform: scale(0.88);
-    เพราะ 1.00 - 0.12 = 0.88
-  */
   .app {
-    /* ปรับความสูงของ container ให้รองรับการ์ดที่เล็กลง หากจำเป็น */
     height: 90vh; 
   }
   .card {
-    transform: scale(0.88) translateY(0) !important;
     transform-origin: center center;
-    /* Reset initial state to prevent double scaling */
     opacity: 0; 
-  }
-  /* ต้องปรับ active state ให้ใช้ scale 0.88 ด้วย */
-  .card.active {
-    opacity: 1;
-    transform: scale(0.88) translateY(0) !important;
-  }
-  /* ปรับ stacked look ให้ใช้ scale 0.88 เป็นฐาน */
-  .card[data-stack="1"]{ 
-    /* 0.88 * 0.96 ≈ 0.845 */
-    transform: scale(0.845) translateY(10px) !important; 
-  }
-  .card[data-stack="2"]{ 
-    /* 0.88 * 0.92 ≈ 0.81 */
-    transform: scale(0.81) translateY(20px) !important; 
   }
 }
 </style>
@@ -363,10 +345,16 @@ body{
 
 <script>
 /*
-  Swipe + fade-in stacking logic
+  Swipe + fade-in stacking logic (Updated for 0.88 scale on iPhone Mini)
 */
 
 const app = document.getElementById('app');
+
+// *** [NEW] ตรวจสอบขนาดหน้าจอเพื่อกำหนด scale factor ***
+const isIphoneMini = window.matchMedia('(max-width: 375px)').matches;
+const scaleFactor = isIphoneMini ? 0.88 : 1;
+const scaleStack1 = scaleFactor * 0.96;
+const scaleStack2 = scaleFactor * 0.92;
 
 function nodeListToArray(){
   return Array.prototype.slice.call(app.querySelectorAll('.card'));
@@ -386,19 +374,25 @@ function restack(){
     c.style.transition = 'transform 320ms cubic-bezier(.22,.9,.28,1), opacity 260ms linear';
     c.style.opacity = ''; // use class to control visibility
     c.dataset.stack = "0";
-    c.style.transform = ''; // reset then set below
+    // กำหนด scale ฐานตาม scaleFactor
+    c.style.transform = `translateY(8px) scale(${scaleFactor * 0.995})`;
   });
+
+  // กำหนด active card scale เป็น scaleFactor (แทน scale 1)
+  top.style.transform = `translateY(0) scale(${scaleFactor})`;
 
   // apply small transforms to the two below for depth
   const second = cards[cards.length - 2];
   const third = cards[cards.length - 3];
   if(second) {
     second.dataset.stack = "1";
-    second.style.transform = 'scale(.96) translateY(10px)';
+    // ใช้ scaleStack1
+    second.style.transform = `scale(${scaleStack1}) translateY(10px)`;
   }
   if(third) {
     third.dataset.stack = "2";
-    third.style.transform = 'scale(.92) translateY(20px)';
+    // ใช้ scaleStack2
+    third.style.transform = `scale(${scaleStack2}) translateY(20px)`;
   }
 }
 
@@ -438,8 +432,8 @@ function bindTopCard(){
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
     const rot = dx / 14;
-    // Apply movement for all cards, including the final one
-    top.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
+    // เพิ่ม scaleFactor เข้าไปใน transform ระหว่างการปัด
+    top.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg) scale(${scaleFactor})`;
   }
 
   function onUp(e){
@@ -457,8 +451,8 @@ function bindTopCard(){
 
     // === LOGIC FOR FINAL CARD (Snap back) ===
     if (isFinalCard) {
-      // If it's the final card, always snap back, never remove
-      top.style.transform = 'translate(0px,0px) rotate(0deg)';
+      // เพิ่ม scaleFactor ในการ snap back
+      top.style.transform = `translate(0px,0px) rotate(0deg) scale(${scaleFactor})`;
       return;
     }
 
@@ -466,7 +460,8 @@ function bindTopCard(){
     if(absDx > threshold || Math.abs(vx) > velocityThreshold){
       const dir = dx > 0 ? 1 : -1;
       const flyX = dir * (window.innerWidth + 500);
-      top.style.transform = `translateX(${flyX}px) rotate(${dir * 30}deg)`;
+      // เพิ่ม scaleFactor ในการ fly out
+      top.style.transform = `translateX(${flyX}px) rotate(${dir * 30}deg) scale(${scaleFactor})`;
       top.style.opacity = '0';
       setTimeout(()=> {
         top.remove();
@@ -476,7 +471,8 @@ function bindTopCard(){
         });
       }, 340);
     } else {
-      top.style.transform = 'translate(0px,0px) rotate(0deg)';
+      // เพิ่ม scaleFactor ในการ snap back
+      top.style.transform = `translate(0px,0px) rotate(0deg) scale(${scaleFactor})`;
     }
   }
 
@@ -505,7 +501,8 @@ window.addEventListener('keydown', (e)=>{
     if (isFinalCard) {
       // For the final card, force snap back instead of removal
       top.style.transition = 'transform 320ms cubic-bezier(.22,.9,.28,1), opacity 260ms linear';
-      top.style.transform = 'translate(0px,0px) rotate(0deg)';
+      // เพิ่ม scaleFactor ในการ snap back
+      top.style.transform = `translate(0px,0px) rotate(0deg) scale(${scaleFactor})`;
       return; 
     }
     
@@ -513,7 +510,8 @@ window.addEventListener('keydown', (e)=>{
     const dir = e.key === 'ArrowRight' ? 1 : -1;
     top.style.transition = 'transform 320ms cubic-bezier(.22,.9,.28,1), opacity 260ms linear';
     const flyX = dir * (window.innerWidth + 500);
-    top.style.transform = `translateX(${flyX}px) rotate(${dir * 30}deg)`;
+    // เพิ่ม scaleFactor ในการ fly out
+    top.style.transform = `translateX(${flyX}px) rotate(${dir * 30}deg) scale(${scaleFactor})`;
     top.style.opacity = '0';
     setTimeout(()=> { top.remove(); restack(); bindTopCard(); }, 340);
   }
@@ -521,7 +519,8 @@ window.addEventListener('keydown', (e)=>{
 
 // recalc stack on resize
 window.addEventListener('resize', () => {
-  setTimeout(restack, 80);
+  // ต้อง reload เพื่อให้ scaleFactor คำนวณใหม่หากเปลี่ยนขนาดหน้าจอข้าม 375px
+  window.location.reload(); 
 });
 </script>
 </body>
