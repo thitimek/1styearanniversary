@@ -132,6 +132,16 @@ body{
   .card{ inset:8px; }
 }
 
+/* ADDED: Specific tweak for small screens (like iPhone 13 mini) to increase vertical space */
+@media (max-width: 375px) {
+    /* Increase vertical padding on the main container to create more space around the card */
+    .app {
+        padding: env(safe-area-inset-top, 30px) 10px 30px 10px; /* Increased 20px to 30px top and bottom */
+        height: 88vh; /* Slight height increase to better accommodate the new padding */
+    }
+}
+
+
 /* prevent image selection dragging artifacts */
 .card-img, .logo-bubble img { -webkit-user-drag: none; user-drag: none; }
 </style>
@@ -139,7 +149,6 @@ body{
 <body>
   <div class="app" id="app">
 
-    <!-- Card 13 (bottom-most) -->
     <div class="card" data-id="13">
       <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/12khaoyai.jpg" alt="Khaoyai">
       <div class="card-content">
@@ -148,7 +157,6 @@ body{
       </div>
     </div>
 
-    <!-- Card 12 -->
     <div class="card" data-id="12">
       <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/11huahin.jpg" alt="Huahin">
       <div class="card-content">
@@ -157,16 +165,14 @@ body{
       </div>
     </div>
 
-    <!-- Card 11 -->
     <div class="card" data-id="11">
       <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/10bookfair.jpg" alt="Book Fair">
       <div class="card-content">
-        <div class="h-title">29 มีนาคม 25 - ไปงานหนังสือ พบเจอพี่ชัยอีฟ  และไปสปา</div>
+        <div class="h-title">29 มีนาคม 25 - ไปงานหนังสือ พบเจอพี่ชัยอีฟ และไปสปา</div>
         <div class="h-sub">เขียนการ์ดแผ่นดินไหวให้เตงง่ะ แล้วก็ไปงานหนังสือกัน หลังจากนั้นก็ไปสปาในตำนาน 555</div>
       </div>
     </div>
 
-    <!-- Card 10 -->
     <div class="card" data-id="10">
       <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/09tattooandsunflower.jpg" alt="Tattoo & Sunflower">
       <div class="card-content">
@@ -175,7 +181,6 @@ body{
       </div>
     </div>
 
-    <!-- Card 9 -->
     <div class="card" data-id="9">
       <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/08valentines.png" alt="Valentines">
       <div class="card-content">
@@ -184,7 +189,6 @@ body{
       </div>
     </div>
 
-    <!-- Card 8 -->
     <div class="card" data-id="8">
       <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/07spacejourney.jpg" alt="Space Journey">
       <div class="card-content">
@@ -193,7 +197,6 @@ body{
       </div>
     </div>
 
-    <!-- Card 7 -->
     <div class="card" data-id="7">
       <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/06oilmeeting.jpg" alt="Oil Meeting">
       <div class="card-content">
@@ -202,7 +205,6 @@ body{
       </div>
     </div>
 
-    <!-- Card 6 -->
     <div class="card" data-id="6">
       <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/05sundaekids.jpg" alt="Sundae Kids">
       <div class="card-content">
@@ -211,7 +213,6 @@ body{
       </div>
     </div>
 
-    <!-- Card 5 -->
     <div class="card" data-id="5">
       <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/04wraptor.png" alt="Wraptor">
       <div class="card-content">
@@ -220,7 +221,6 @@ body{
       </div>
     </div>
 
-    <!-- Card 4 -->
     <div class="card" data-id="4">
       <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/04cover.jpg" alt="Cover">
       <div class="card-content">
@@ -229,7 +229,6 @@ body{
       </div>
     </div>
 
-    <!-- Card 3 -->
     <div class="card" data-id="3">
       <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/nichaprofile.jpg" alt="Nicha">
       <div class="card-content">
@@ -238,7 +237,6 @@ body{
       </div>
     </div>
 
-    <!-- Card 2 -->
     <div class="card" data-id="2">
       <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/thitiprofile.jpg" alt="Thiti">
       <div class="card-content">
@@ -247,7 +245,6 @@ body{
       </div>
     </div>
 
-    <!-- Card 1 (top) -->
     <div class="card active" data-id="1" style="background:#fffbee;">
       <div class="logo-bubble">
         <img src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/bumblelogo.png" alt="Bumble">
