@@ -132,12 +132,54 @@ body{
   .card{ inset:8px; }
 }
 
-/* ADDED: Specific tweak for small screens (like iPhone 13 mini) to increase vertical space */
+/* MODIFIED: Specific tweak for small screens (like iPhone 13 mini) */
 @media (max-width: 375px) {
     /* Increase vertical padding on the main container to create more space around the card */
     .app {
-        padding: env(safe-area-inset-top, 30px) 10px 30px 10px; /* Increased 20px to 30px top and bottom */
-        height: 88vh; /* Slight height increase to better accommodate the new padding */
+        /* Adjusted height to prevent card from being too short, balancing with new card size */
+        height: 85vh; /* Reverted to 85vh or slightly adjusted as needed */
+        padding: env(safe-area-inset-top, 25px) 10px 25px 10px; /* Slightly increased padding */
+    }
+
+    /* Reduce the overall height of the card on iPhone 13 mini */
+    .card {
+        height: calc(100% - 30px); /* Make card slightly shorter to create more vertical space */
+        top: 15px; /* Adjust top position to center it or push down slightly */
+        bottom: 15px; /* Adjust bottom position */
+        left: 10px; /* Keep horizontal inset */
+        right: 10px; /* Keep horizontal inset */
+    }
+
+    /* Adjust image height to give more space to content or overall card */
+    .card-img {
+        height: 55%; /* Reduced image height from 62% to 55% */
+    }
+
+    /* Adjust content padding to make the text area more compact */
+    .card-content {
+        padding: 12px; /* Reduced padding from 16px to 12px */
+        gap: 6px; /* Reduced gap between elements */
+    }
+
+    /* Adjust font sizes if needed for more compactness */
+    .h-title {
+        font-size: 19px;
+    }
+    .h-sub {
+        font-size: 13.5px;
+    }
+
+    /* Adjust logo bubble position for the first card if card height changes */
+    .card[data-id="1"] .logo-bubble {
+        top: 15px; /* Adjust as needed based on new card height */
+        width: 90px;
+        height: 90px;
+    }
+    .card[data-id="1"] .logo-bubble img {
+        width: 60px;
+    }
+    .card[data-id="1"] .card-content .h-title {
+        margin-top: 100px; /* Adjust margin-top for title in first card */
     }
 }
 
