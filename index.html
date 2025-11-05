@@ -87,6 +87,8 @@ body{
   flex-direction:column;
   gap:8px;
   justify-content:flex-start;
+  /* default: white background */
+  background-color: #fff; 
 }
 
 /* headings */
@@ -134,16 +136,23 @@ body{
 
 /* prevent image selection dragging artifacts */
 .card-img, .logo-bubble img { -webkit-user-drag: none; user-drag: none; }
+
+/* --- Special CSS for Card 22 REMOVED --- */
+/* Card 18's style is carried over from last successful change */
+.card[data-id="18"] .card-img {
+  object-position: top;
+}
+
 </style>
 </head>
 <body>
   <div class="app" id="app">
 
     <div class="card" data-id="22">
-      <img class="card-img" src="" alt="Final Message">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/22%20end.jpg" alt="Final Message" style="object-position: top;">
       <div class="card-content">
         <div class="h-title">ขอบคุณที่อยู่ด้วยกันนะ 🌻</div>
-        <div class="h-sub">เค้าดีใจมากเลยที่ยังอยู่ด้วยกัน เค้ามีทำตัวไม่น่ารักกับเตงบ้าง งอแงบ้าง (เยอะ) แต่เตงก็ยังน่ารักกับเค้าเสมอเลย ขอบคุณที่อยู่ข้างๆ เค้านะ ไปครับ เราจะเติบโตไปด้วยกัน 🤎</div>
+        <div class="h-sub">เค้าดีใจมากเลยที่ยังอยู่ด้วยกัน เค้ามีทำตัวไม่น่ารักกับเตงบ้าง งอแงบ้าง (เยอะ) แต่เตงก็ยังน่ารักกับเค้าเสมอเลย ขอบคุณที่อยู่ข้างๆ เค้า นะ ไปครับ เราจะเติบโตไปด้วยกัน 🤎</div>
       </div>
     </div>
 
@@ -172,7 +181,7 @@ body{
     </div>
 
     <div class="card" data-id="18">
-      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/17donation.jpg" alt="ทำบุญวันเกิดมูลนิธิกระจกเงา">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/17donation.jpg" alt="ทำบุญวันเกิดมูลนิธิกระจกเงา" style="object-position: top;">
       <div class="card-content">
         <div class="h-title">11 กรกฎา 25 - ทำบุญวันเกิดมูลนิธิกระจกเงา</div>
         <div class="h-sub">เอาของไปบริจาคกัน ช่วงนั้นน่าจะเป็นเทศกาล เคลียร์ห้อง จัดห้อง ที่เค้าไปหาเตง</div>
@@ -315,7 +324,7 @@ body{
         <div class="h-title" style="margin-top:120px;">
           Happy 1st Anniversary 💛<br>สวัสดีครับ คุณณิชา<br>จำได้มั้ยครับเราเจอกันที่ไหน?
         </div>
-        <div class="h-sub" style="margin-top:10px;">เป็นเวลาหนึ่งปีแล้วนะที่ได้ใช้เวลาร่วมกันมา ดีจังเลยนะที่ได้อยู่ด้วยกัน</div>
+        <div class="h-sub" style="margin-top:10px;">เป็นเวลาหนึ่งปีแล้วนะที่ได้ใช้เวลาร่วมกันมา<br>ดีจังเลยนะที่ได้อยู่ด้วยกัน</div>
       </div>
     </div>
 
@@ -324,11 +333,6 @@ body{
 <script>
 /*
   Swipe + fade-in stacking logic
-  - Cards are in DOM order: bottom ... top (card with data-id="1" is top)
-  - Top card has class "active"
-  - When swiped away, we remove top card and reveal next; newly revealed card gets .active
-  - Uses pointer events for desktop & mobile
-  - restack() sets visual stack transforms for remaining cards (no abrupt jumps)
 */
 
 const app = document.getElementById('app');
@@ -365,7 +369,6 @@ function restack(){
     third.dataset.stack = "2";
     third.style.transform = 'scale(.92) translateY(20px)';
   }
-  // ensure top explicitly visible (class handles opacity/transform)
 }
 
 // bind pointer interactions to top card
@@ -386,6 +389,7 @@ function bindTopCard(){
 
   let pointerId = null;
   let startX = 0, startY = 0, startTime = 0;
+  const isFinalCard = top.dataset.id === "22"; // Check if it's the final card
 
   function onDown(e){
     // only primary pointer
@@ -403,6 +407,7 @@ function bindTopCard(){
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
     const rot = dx / 14;
+    // Apply movement for all cards, including the final one
     top.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
   }
 
@@ -419,6 +424,14 @@ function bindTopCard(){
 
     top.style.transition = 'transform 320ms cubic-bezier(.22,.9,.28,1), opacity 260ms linear';
 
+    // === LOGIC FOR FINAL CARD (Snap back) ===
+    if (isFinalCard) {
+      // If it's the final card, always snap back, never remove
+      top.style.transform = 'translate(0px,0px) rotate(0deg)';
+      return;
+    }
+
+    // Original logic for all other cards (1-21)
     if(absDx > threshold || Math.abs(vx) > velocityThreshold){
       const dir = dx > 0 ? 1 : -1;
       const flyX = dir * (window.innerWidth + 500);
@@ -450,12 +463,22 @@ function bindTopCard(){
 restack();
 bindTopCard();
 
-// keyboard support
+// keyboard support (Prevent keyboard removal for the final card)
 window.addEventListener('keydown', (e)=>{
   if(e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
     const cards = nodeListToArray();
     const top = cards[cards.length - 1];
     if(!top) return;
+    const isFinalCard = top.dataset.id === "22";
+
+    if (isFinalCard) {
+      // For the final card, force snap back instead of removal
+      top.style.transition = 'transform 320ms cubic-bezier(.22,.9,.28,1), opacity 260ms linear';
+      top.style.transform = 'translate(0px,0px) rotate(0deg)';
+      return; 
+    }
+    
+    // Logic for other cards
     const dir = e.key === 'ArrowRight' ? 1 : -1;
     top.style.transition = 'transform 320ms cubic-bezier(.22,.9,.28,1), opacity 260ms linear';
     const flyX = dir * (window.innerWidth + 500);
