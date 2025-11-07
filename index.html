@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Happy 1st Anniversary</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bumble-yellow: #FFCF00;
+  --logo-yellow: #ffdb5b;
+  --card-radius: 20px;
+  --max-width: 380px;
+}
+
+/* reset */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family: 'IBM Plex Sans Thai', system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  background: var(--bumble-yellow);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  /* [แก้ไข] ลบ padding แนวตั้ง (20px) เพื่อไม่ให้เกิด overflow แต่เก็บ padding แนวนอน 20px ไว้ */
+  padding:0 20px; 
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* container fixed size (responsive) */
+.app{
+  width:90%;
+  max-width:var(--max-width);
+  /* [ปรับปรุง] เพิ่ม height เป็น 90vh เพราะไม่มี body padding รบกวนแล้ว */
+  height:90vh; 
+  max-height:900px;
+  position:relative;
+  margin:auto;
+  padding: 0 10px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* card base */
+.card{
+  position:absolute;
+  inset:10px; /* leaves a small gap on all sides so chrome/safari mobile won't touch edges */
+  background:#fff;
+  border-radius:var(--card-radius);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  touch-action:none;
+  transform-origin:center;
+  /* initial (hidden) state for fade-in transitions */
+  opacity:0;
+  /* transform จะถูกกำหนดโดย JS ใน restack() */
+  transform: translateY(8px) scale(0.995); 
+  transition: transform 320ms cubic-bezier(.22,.9,.28,1), opacity 260ms linear;
+  user-select:none;
+  -webkit-user-select:none;
+}
+
+/* active card visible */
+.card.active{
+  opacity:1;
+  /* transform จะถูกกำหนดโดย JS ใน restack() */
+  transform: translateY(0) scale(1);
+}
+
+/* stacked look for lower cards (purely visual) */
+.card[data-stack="1"]{ transform: scale(.96) translateY(10px); }
+.card[data-stack="2"]{ transform: scale(.92) translateY(20px); }
+
+/* image area */
+.card-img{
+  width:100%;
+  height:62%;
+  object-fit:cover;
+  display:block;
+}
+
+/* content area */
+.card-content{
+  padding:16px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  justify-content:flex-start;
+  /* default: white background */
+  background-color: #fff; 
+}
+
+/* headings */
+.h-title{
+  font-weight:700;
+  font-size:20px;
+  color:#111;
+  line-height:1.35;
+}
+.h-sub{
+  font-weight:400;
+  font-size:14.5px;
+  color:#333;
+  line-height:1.5;
+  white-space:pre-line;
+}
+
+/* logo bubble for first card */
+.logo-bubble{
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  background: var(--logo-yellow);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:absolute;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  box-shadow:0 6px 12px rgba(0,0,0,0.12);
+  z-index:5;
+}
+.logo-bubble img{ width:70px; height:auto; display:block; }
+
+/* responsive tweaks */
+@media (max-width:400px){
+  .app{ height:86vh; }
+  .logo-bubble{ width:80px; height:80px; top:16px; }
+  .logo-bubble img{ width:56px; }
+  .h-title{ font-size:18px; }
+  .h-sub{ font-size:14px; }
+  .card{ inset:8px; }
+}
+
+/* prevent image selection dragging artifacts */
+.card-img, .logo-bubble img { -webkit-user-drag: none; user-drag: none; }
+
+/* Card 18's style is carried over from last successful change */
+.card[data-id="18"] .card-img {
+  object-position: top;
+}
+
+/* --- Special CSS for iPhone 13 Mini (375px wide) --- */
+/* Scale factor ถูกย้ายไปจัดการใน JS เพื่อให้ปัดได้ */
+@media (max-width: 375px) {
+  .app {
+    height: 90vh; 
+  }
+  .card {
+    transform-origin: center center;
+    opacity: 0; 
+  }
+}
+</style>
+</head>
+<body>
+  <div class="app" id="app">
+
+    <div class="card" data-id="22">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/22end_edit.png" alt="Final Message" style="object-position: top;">
+      <div class="card-content">
+        <div class="h-title">ขอบคุณที่อยู่ด้วยกันนะ 🌻</div>
+        <div class="h-sub">ผ่านมาแล้วปีนึง มีเรื่องราวเกิดขึ้นมากมาย มีไม่เข้าใจกันบ้าง มีช่วงลำบากกันบ้าง มีช่วงเวลาที่ดีเยอะ และก็ยังอยู่ด้วยกัน<br><br>ขอบคุณที่อยู่ข้างๆ เค้านะ ในทุกช่วงเวลาเลยไม่ว่าจะดีหรือร้าย ไปครับ ไปกันต่อ เติบโตไปด้วยกัน ✌️</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="21">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/20exhibition.png" alt="ไปดูงานเจ">
+      <div class="card-content">
+        <div class="h-title">4 ตุลาคม 25 - ไปดูงานศิลปะของเจ</div>
+        <div class="h-sub">ไม่ได้เจอพี่ชัย อีฟ นาน และเพื่อนเค้ากำลังโชว์งานอยู่ เลยชวนไปดูงานด้วยกัน<br><br>ปิดท้ายด้วยการไปกิน อจิไซ ราเมน ที่ชื่นชอบ 🤣</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="20">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/19accident_edit.jpg" alt="เตงหกล้ม">
+      <div class="card-content">
+        <div class="h-title">14 กันยา 25 - อุบัติเหตุ</div>
+        <div class="h-sub">เค้าไปหาหมอที่รพ. ราม และเตงโทรมาบอกว่าหกล้มหัวฟาด โชคดีที่ไม่เป็นอะไร<br><br>ส่วนคุณหมอคงบอกว่า 'โชคดีที่กะโหลกหนาครับ'</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="19">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/18german.png" alt="เรียนเยอรมัน">
+      <div class="card-content">
+        <div class="h-title">20 กรกฎา 25 - เรียนเยอรมัน</div>
+        <div class="h-sub">เทศกาลเรียนหนังสือทุกเสาร์ที่ส่วนกลางคอนโด</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="18">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/17donation.jpg" alt="ทำบุญวันเกิดมูลนิธิกระจกเงา" style="object-position: top;">
+      <div class="card-content">
+        <div class="h-title">11 กรกฎา 25 - ทำบุญวันเกิด มูลนิธิกระจกเงา</div>
+        <div class="h-sub">เอาของไปบริจาคกัน ช่วงนั้นน่าจะเป็นช่วงที่เริ่มไปช่วยเตงจัดระเบียบห้อง ประกอบของต่างๆ</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="17">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/16birthdayadvance.png" alt="สุขสันต์วันเกิดล่วงหน้า">
+      <div class="card-content">
+        <div class="h-title">21 มิถุนา 25 - สุขสันต์วันเกิดล่วงหน้า</div>
+        <div class="h-sub">เป็นการเซอร์ไพร์สที่งงตั้งแต่เจ้าของวันเกิด และคนร่วมขบวนการ<br><br>ดีนะที่เจ้าตัวยังฟื้นตัวไม่เต็มที่ ไม่งั้นคงโป๊ะกว่านี้ 55</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="16">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/15leoyoyo.jpg" alt="เจอ โยโย่ ลีโอ ไอรดา">
+      <div class="card-content">
+        <div class="h-title">20 มิถุนา 25 - เจอ โยโย่ ลีโอ ไอรดา</div>
+        <div class="h-sub">ไปเที่ยวกับเพื่อนๆ เตงอีกแล้ว ตำนานสวยทะลุสตอรี่ รุ่นพี่ที่ไม่ได้คุยกัน 5 ปีถึงกับทักมา 🤣</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="15">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/14pray.jpg" alt="ไหว้พระขอพร">
+      <div class="card-content">
+        <div class="h-title">25 พฤษภา 25 - ไหว้พระขอพร</div>
+        <div class="h-sub">ช่วงเวลาแห่งการเปลี่ยนผ่านงาน สาธุ ขอให้พบเจอสิ่งดีๆ และในที่สุดเตงก็ได้งานที่ดี</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="14">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/13hospital.png" alt="ป่วยบ่อย">
+      <div class="card-content">
+        <div class="h-title">7 พฤษภา 25 - ผ่านม</div>
+        <div class="h-sub">ช่วงนี้เตงป่วยบ่อย ไปรพ. กันเกือบทุกอาทิตย์เลย แต่ปัจจุบันแข็งแรงขึ้นเยอะแล้ว เย้เย้</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="13">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/12khaoyai.jpg" alt="Khaoyai">
+      <div class="card-content">
+        <div class="h-title">13 เมษายน 25 (สงกรานต์) - เขาใหญ่</div>
+        <div class="h-sub">ทริปแห่งความปัง ปุริเย่ เปิดทริปด้วยการจำวันผิด ต้องไปหาที่นอนเอาดาบหน้าก่อน 1 วัน 🤣<br><br>บันเทิงทุกวัน ได้กินอาหารดีๆ ได้นอนที่พักดีๆ เตงเซอร์ไพร์สเค้าด้วย เป็นช่วงเวลาดีๆ ตลอด 3 วันเลย และก็ได้เป็นแฟนกันแล้วน้า</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="12">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/11huahin.jpg" alt="Huahin">
+      <div class="card-content">
+        <div class="h-title">5 เมษา 25 - หัวหิน พบเจอไอรดา คริปโตเนียน</div>
+        <div class="h-sub">ประทับใจมาก เตงชวนเค้าไปเที่ยวด้วย เป็นหนึ่งในเหตุการณ์สำคัญ เพราะพบเจอ 1 ในบุคคลสำคัญในชีวิตของเตง นั่นคือไอรดา</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="11">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/10bookfair.jpg" alt="Book Fair">
+      <div class="card-content">
+        <div class="h-title">29 มีนาคม 25 - ไปงานหนังสือ พบเจอพี่ชัย อีฟ และไปสปา</div>
+        <div class="h-sub">หลังจากเกิดแผ่นดินไหวได้ไม่นานก็นัดกันไปงานหนังสือกัน เค้าทำการ์ดกับเอาดอกกุหลาบไปให้ เตงเจอเพื่อนๆ เค้าครั้งแรก และเราไปสปากันต่อ 😂</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="10">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/09tattooandsunflower.jpg" alt="Tattoo & Sunflower">
+      <div class="card-content">
+        <div class="h-title">22 กุมภา 25 - ไปสักและไปสวนรถไฟ</div>
+        <div class="h-sub">เตงชวนเค้าไปสัก (หมายถึงไปรอเตงสัก) เค้าเลยซื้อดอกทานตะวันไปให้ (มีคนบ่นว่าอยากได้ดอกไม้แหล่ะ)<br><br>ตัวแทนแห่งดอกทานตะวัน จะคอยอยู่เคียงข้างเธอเอง 🌻</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="9">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/08valentines.png" alt="Valentines">
+      <div class="card-content">
+        <div class="h-title">14 กุมภา 25 - Valentines</div>
+        <div class="h-sub">สุขสันต์วันวาเลนไทน์ครับ เขินจะแย่มีสาวสวยมาหาถึงบ้าน 🥰</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="8">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/07spacejourney.jpg" alt="Space Journey">
+      <div class="card-content">
+        <div class="h-title">2 กุมภา 25 - Space Journey</div>
+        <div class="h-sub">เริ่มรู้ความสนใจของเตงมากขึ้น โดยจะมีเรื่องอวกาศ วิทยาศาสตร์บางอย่าง ประวัติศาสตร์ และก็เคยอยากเป็นนักบินอวกาศ (ดูจากรูปก็รู้เนอะ)</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="7">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/06oilmeeting.jpg" alt="Oil Meeting">
+      <div class="card-content">
+        <div class="h-title">24 มกรา 25 - ไปหาออยกับดาว</div>
+        <div class="h-sub">เตงชวนเค้าไปหาเพื่อนซึ่งจริงๆ ตอนนั้นก็เกร็งมากเพราะมีแต่สาวๆ แต่ก็ตัดสินใจไปด้วย จะได้สนิทกันขึ้น 🤣</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="6">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/05sundaekids.jpg" alt="Sundae Kids">
+      <div class="card-content">
+        <div class="h-title">1 ธันวา 24 - ไปดูนิทรรศการ Sundae Kids</div>
+        <div class="h-sub">หลังจากนั้นก็ค่อยๆ สนิทกันขึ้นเรื่อยๆ ไปดูงานศิลปะของศิลปินที่ชอบกัน</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="5">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/04wraptor.png" alt="Wraptor">
+      <div class="card-content">
+        <div class="h-title">1st Date พฤศจิกายน 24 - Wraptor</div>
+        <div class="h-sub">การพบกันของครั้งแรกของหญิงสาวพูดเร็วที่มีไลฟ์สไตล์อันหรูหราหมาเห่ากับพ่อบ้านญี่ปุ่นที่มีวิถีชีวิต Minimal<br><br>ชายหนุ่มเกือบไม่ได้ไปต่อเพราะไปผิดสาขาแถมพูดจาวกวน 55</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="4">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/04cover.jpg" alt="Cover">
+      <div class="card-content">
+        <div class="h-title">เราผ่านอะไรกันมาบ้างนะ...</div>
+        <div class="h-sub">อาจมีบางเหตุการณ์ไม่ได้ใส่มา ไม่ใช่เพราะว่าไม่สำคัญ แต่เพราะว่ามันใส่ไม่หมด โมเมนต์มันเยอะมาก ไม่สามารถเรียบเรียงไทม์ไลน์ได้ถูกต้อง<br><br>ต้องขอบคุณสตอรี่ไอจีในการเรียบเรียง มา ณ ที่นี้</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="3">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/nichaprofile.jpg" alt="Nicha">
+      <div class="card-content">
+        <div class="h-title">Nicha Sampachanyasatit</div>
+        <div class="h-sub">If urgent, please call someone else</div>
+      </div>
+    </div>
+
+    <div class="card" data-id="2">
+      <img class="card-img" src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/thitiprofile.jpg" alt="Thiti">
+      <div class="card-content">
+        <div class="h-title">Thiti Mekrungrojn</div>
+        <div class="h-sub">กราฟิกที่ทำกราฟิกได้นิดหน่อย ถ่ายรูปบ้างบางเวลา</div>
+      </div>
+    </div>
+
+    <div class="card active" data-id="1" style="background:#fffbee;">
+      <div class="logo-bubble">
+        <img src="https://raw.githubusercontent.com/thitimek/hellonicha/refs/heads/main/images/bumblelogo.png" alt="Bumble">
+      </div>
+      <div class="card-content" style="align-items:center; text-align:center;">
+        <div class="h-title" style="margin-top:120px;">
+          Happy 1st Anniversary 💛<br>สวัสดีครับ คุณณิชา<br>จำได้มั้ยครับเราเจอกันที่ไหน?
+        </div>
+        <div class="h-sub" style="margin-top:10px;">รู้จักกันมาปีนึงแล้วนะ ดีใจที่ได้ใช้เวลาดีๆ ร่วมกัน และดีจังเลยที่ยังอยู่ด้วยกัน 🌻<br><br>อยากรู้ว่าเรื่องราวจะเป็นอย่างไรก็ปัดขวาได้เลย ➡️</div>
+      </div>
+    </div>
+
+  </div>
+
+  <audio id="bgm" preload="auto">
+    <source src="https://github.com/thitimek/1styearanniversary/raw/refs/heads/main/images/daylight.m4a" type="audio/mp4">
+  </audio>
+
+<script>
+/*
+  Swipe + fade-in stacking logic (Updated for 0.88 scale on iPhone Mini)
+*/
+
+const app = document.getElementById('app');
+const audio = document.getElementById("bgm"); // เรียกใช้ element เพลง
+let isPlayed = false; // ตัวแปรสำหรับเช็คว่าเล่นเพลงไปแล้วหรือยัง
+
+// *** ตรวจสอบขนาดหน้าจอเพื่อกำหนด scale factor ***
+const isIphoneMini = window.matchMedia('(max-width: 375px)').matches;
+const scaleFactor = isIphoneMini ? 0.88 : 1;
+const scaleStack1 = scaleFactor * 0.96;
+const scaleStack2 = scaleFactor * 0.92;
+
+function nodeListToArray(){
+  return Array.prototype.slice.call(app.querySelectorAll('.card'));
+}
+
+// Set initial stack attributes and active
+function restack(){
+  const cards = nodeListToArray();
+  // clear active
+  cards.forEach(c => c.classList.remove('active'));
+  if(cards.length === 0) return;
+  const top = cards[cards.length - 1];
+  top.classList.add('active');
+
+  // reset transitions for all
+  cards.forEach(c => {
+    c.style.transition = 'transform 320ms cubic-bezier(.22,.9,.28,1), opacity 260ms linear';
+    c.style.opacity = ''; // use class to control visibility
+    c.dataset.stack = "0";
+    // กำหนด scale ฐานตาม scaleFactor
+    c.style.transform = `translateY(8px) scale(${scaleFactor * 0.995})`;
+  });
+
+  // กำหนด active card scale เป็น scaleFactor (แทน scale 1)
+  top.style.transform = `translateY(0) scale(${scaleFactor})`;
+
+  // apply small transforms to the two below for depth
+  const second = cards[cards.length - 2];
+  const third = cards[cards.length - 3];
+  if(second) {
+    second.dataset.stack = "1";
+    // ใช้ scaleStack1
+    second.style.transform = `scale(${scaleStack1}) translateY(10px)`;
+  }
+  if(third) {
+    third.dataset.stack = "2";
+    // ใช้ scaleStack2
+    third.style.transform = `scale(${scaleStack2}) translateY(20px)`;
+  }
+}
+
+// **ฟังก์ชันเล่นเพลง**
+function playMusic() {
+  if (!isPlayed) {
+    audio.play().catch(err => console.log("Autoplay blocked:", err));
+    isPlayed = true;
+  }
+}
+
+// bind pointer interactions to top card
+function bindTopCard(){
+  const cards = nodeListToArray();
+  const top = cards[cards.length - 1];
+  if(!top) return;
+
+  // ensure restack state
+  restack();
+
+  // remove previous listeners if any
+  if(top._bound) {
+    top.removeEventListener('pointerdown', top._onDown);
+    top.removeEventListener('pointermove', top._onMove);
+    top.removeEventListener('pointerup', top._onUp);
+  }
+
+  let pointerId = null;
+  let startX = 0, startY = 0, startTime = 0;
+  const isFinalCard = top.dataset.id === "22"; // Check if it's the final card
+  const isFirstCard = top.dataset.id === "1"; // **เช็คว่าเป็นใบแรกหรือไม่**
+
+  function onDown(e){
+    // only primary pointer
+    if(e.button && e.button !== 0) return;
+    pointerId = e.pointerId;
+    try { top.setPointerCapture(pointerId); } catch(err){}
+    startX = e.clientX;
+    startY = e.clientY;
+    startTime = performance.now();
+    top.style.transition = 'none';
+  }
+
+  function onMove(e){
+    if(pointerId === null || e.pointerId !== pointerId) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const rot = dx / 14;
+    // เพิ่ม scaleFactor เข้าไปใน transform ระหว่างการปัด
+    top.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg) scale(${scaleFactor})`;
+  }
+
+  function onUp(e){
+    if(pointerId === null || e.pointerId !== pointerId) return;
+    try { top.releasePointerCapture(pointerId); } catch(err){}
+    pointerId = null;
+    const dx = e.clientX - startX;
+    const dt = performance.now() - startTime;
+    const vx = dx / (dt || 1);
+    const absDx = Math.abs(dx);
+    const threshold = 110;
+    const velocityThreshold = 0.5;
+
+    top.style.transition = 'transform 320ms cubic-bezier(.22,.9,.28,1), opacity 260ms linear';
+
+    // === LOGIC FOR FINAL CARD (Snap back) ===
+    if (isFinalCard) {
+      // เพิ่ม scaleFactor ในการ snap back
+      top.style.transform = `translate(0px,0px) rotate(0deg) scale(${scaleFactor})`;
+      return;
+    }
+
+    // Original logic for all other cards (1-21)
+    if(absDx > threshold || Math.abs(vx) > velocityThreshold){
+      // **เรียกใช้ playMusic() เมื่อเป็นการ์ดใบแรกและมีการปัดผ่าน threshold**
+      if (isFirstCard) {
+        playMusic();
+      }
+
+      const dir = dx > 0 ? 1 : -1;
+      const flyX = dir * (window.innerWidth + 500);
+      // เพิ่ม scaleFactor ในการ fly out
+      top.style.transform = `translateX(${flyX}px) rotate(${dir * 30}deg) scale(${scaleFactor})`;
+      top.style.opacity = '0';
+      setTimeout(()=> {
+        top.remove();
+        requestAnimationFrame(()=> { // **แก้ไขตรงนี้: เปลี่ยน )> เป็น )=>**
+          restack();
+          bindTopCard();
+        });
+      }, 340);
+    } else {
+      // เพิ่ม scaleFactor ในการ snap back
+      top.style.transform = `translate(0px,0px) rotate(0deg) scale(${scaleFactor})`;
+    }
+  }
+
+  top._onDown = onDown;
+  top._onMove = onMove;
+  top._onUp = onUp;
+  top._bound = true;
+
+  top.addEventListener('pointerdown', onDown);
+  top.addEventListener('pointermove', onMove);
+  top.addEventListener('pointerup', onUp);
+}
+
+// init
+restack();
+bindTopCard();
+
+// keyboard support (Prevent keyboard removal for the final card)
+window.addEventListener('keydown', (e)=>{
+  if(e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    const cards = nodeListToArray();
+    const top = cards[cards.length - 1];
+    if(!top) return;
+    const isFinalCard = top.dataset.id === "22";
+    const isFirstCard = top.dataset.id === "1"; // **เช็คว่าเป็นใบแรกหรือไม่**
+
+    if (isFinalCard) {
+      // For the final card, force snap back instead of removal
+      top.style.transition = 'transform 320ms cubic-bezier(.22,.9,.28,1), opacity 260ms linear';
+      // เพิ่ม scaleFactor ในการ snap back
+      top.style.transform = `translate(0px,0px) rotate(0deg) scale(${scaleFactor})`;
+      return; 
+    }
+    
+    // Logic for other cards
+    // **เรียกใช้ playMusic() เมื่อเป็นการ์ดใบแรกและมีการปัดด้วยปุ่ม**
+    if (isFirstCard) {
+        playMusic();
+    }
+    
+    const dir = e.key === 'ArrowRight' ? 1 : -1;
+    top.style.transition = 'transform 320ms cubic-bezier(.22,.9,.28,1), opacity 260ms linear';
+    const flyX = dir * (window.innerWidth + 500);
+    // เพิ่ม scaleFactor ในการ fly out
+    top.style.transform = `translateX(${flyX}px) rotate(${dir * 30}deg) scale(${scaleFactor})`;
+    top.style.opacity = '0';
+    setTimeout(()=> { top.remove(); restack(); bindTopCard(); }, 340);
+  }
+});
+
+// recalc stack on resize
+window.addEventListener('resize', () => {
+  // ต้อง reload เพื่อให้ scaleFactor คำนวณใหม่หากเปลี่ยนขนาดหน้าจอข้าม 375px
+  window.location.reload(); 
+});
+</script>
+</body>
+</html>
